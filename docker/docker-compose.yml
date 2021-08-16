@@ -1,0 +1,47 @@
+version: '3.4'
+services:
+  web:
+    build: .
+    volumes:
+      - ./..:/dev/app
+    ports:
+      - "4444:3333"
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      NODE_ENV: production
+      REDIS_PORT: 6379
+      REDIS_HOST: cache_redis
+      DB_PORT: 5432
+      DB_HOST: postgres_socket_database
+      DB_NAME: socket
+      DB_USER: app
+      DB_PASSWORD: password
+      # REDIS_URL : ""
+    networks:
+      - fullapp
+  postgres:
+    image: postgres:13
+    container_name: postgres_socket_database
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_DB: socket
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - fullapp
+  redis:
+    image: redis
+    container_name: cache_redis
+    ports:
+      - "6380:6379"
+    expose:
+      - 6380
+    networks:
+      - fullapp
+networks:
+  fullapp:
+    driver: bridge
